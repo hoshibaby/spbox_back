@@ -18,6 +18,11 @@ public interface BoxService {
 
     // MessageController 에서도 쓰기 편하게 Box 반환용
     Box getBoxByOwnerUserId(String userId);
+
+    void updateAllowAnonymous(String userId, boolean allowAnonymous);
+
+    void updateAiMode(String userId, boolean enabled);
+
 }
 
 

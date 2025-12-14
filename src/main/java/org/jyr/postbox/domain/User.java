@@ -44,16 +44,24 @@ public class User {
     @Column(length = 300)
     private String headerImageUrl;
 
-    // USER, ADMIN ...
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private UserRole role;
-
     // ✅ AI 상담 모드 사용 여부 (기본값 false)
     @Column(nullable = false)
     private boolean aiConsultingEnabled;
 
     private LocalDateTime createdAt;
+
+    // 오늘 한마디 (nullable 허용)
+    @Column(length = 120)
+    private String todayMessage;
+
+    // USER, ADMIN ...
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private UserRole role = UserRole.USER;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private UserStatus status = UserStatus.ACTIVE;
 
     @PrePersist
     public void onCreate() {
@@ -65,6 +73,9 @@ public class User {
         if (!this.aiConsultingEnabled) {
             this.aiConsultingEnabled = false;
         }
+        if (this.status == null) this.status = UserStatus.ACTIVE;
     }
+
+
 }
 

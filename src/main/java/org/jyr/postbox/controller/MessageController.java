@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -34,8 +36,8 @@ public class MessageController {
         if (userId != null) {
             loginUserOrNull = userService.findById(userId);
         }
+
         Long messageId = messageService.createMessage(dto, loginUserOrNull);
-        // 201 + 생성된 메시지 PK 반환
         return ResponseEntity.status(HttpStatus.CREATED).body(messageId);
     }
 
@@ -51,7 +53,6 @@ public class MessageController {
         MessagePageDTO dto = messageService.getPublicMessages(boxUrlKey, page, size);
         return ResponseEntity.ok(dto);
     }
-
 
     // =========================
     // 2. MyBox - 메시지 목록 조회
@@ -80,9 +81,6 @@ public class MessageController {
         MessagePageDTO dto = messageService.getAnsweredMessagesForOwner(owner, page, size);
         return ResponseEntity.ok(dto);
     }
-
-
-
 
     // =========================
     // 3. MyBox - 메시지 상세 조회
@@ -160,7 +158,7 @@ public class MessageController {
             @PathVariable Long id,
             @RequestBody MessageUpdateRequestDTO dto
     ) {
-        User loginUser = userService.findById(dto.getUserId()); // dto.userId도 Long PK
+        User loginUser = userService.findById(dto.getUserId());
         messageService.updateMessage(id, dto.getContent(), loginUser);
         return ResponseEntity.ok("메시지 수정 완료");
     }
@@ -169,15 +167,37 @@ public class MessageController {
     // 8. 원본 메시지 삭제
     //    - 내 박스에 내가 쓴 메시지만 삭제 가능
     // =========================
+//    @DeleteMapping("/me/messages/{id}")
+//    public ResponseEntity<?> deleteMessage(
+//            @PathVariable Long id,
+//            @RequestParam("userId") Long userId
+//    ) {
+//        User loginUser = userService.findById(userId);
+//        messageService.deleteMessage(id, loginUser);
+//        return ResponseEntity.ok("메시지 삭제 완료");
+//    }
+
     @DeleteMapping("/me/messages/{id}")
     public ResponseEntity<?> deleteMessage(
             @PathVariable Long id,
-            @RequestParam("userId") Long userId
+            @RequestParam("userPk") Long userPk
     ) {
-        User loginUser = userService.findById(userId);
+        User loginUser = userService.findById(userPk);
         messageService.deleteMessage(id, loginUser);
         return ResponseEntity.ok("메시지 삭제 완료");
     }
 
+    // =========================
+    // 9. AI 답변 생성 (박스 주인만)
+    //    - 로그인 유저는 Principal에서 가져옴
+    //    - 실제 URL: POST /api/messages/{id}/ai-reply
+    // =========================
+    @PostMapping("/messages/{id}/ai-reply")
+    public ResponseEntity<Void> generateAiReply(@PathVariable Long id, Principal principal) {
 
+        String loginUserId = principal.getName(); // JWT subject(userId) 가 들어오는 구조라면 OK
+        messageService.generateAiReply(id, loginUserId);
+
+        return ResponseEntity.ok().build();
+    }
 }

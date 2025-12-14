@@ -41,7 +41,7 @@ public class Message {
     @Column(nullable = false)
     private boolean systemMessage;
 
-    // 박스 주인의 답변 (있을 수도, 없을 수도)
+    // 답변 내용
     @Column(length = 1000)
     private String replyContent;
 
@@ -52,12 +52,19 @@ public class Message {
     @Column(nullable = false, length = 20)
     private AuthorType authorType;
 
-
+    // 답변 작성자 타입: OWNER / AI
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private ReplyAuthorType replyAuthorType;
 
     // OWNER일 때만 채워지는 필드
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_user_id")
     private User authorUser;
+
+    // 비공개 메시지 여부 (박스 주인만 보기)
+    @Column(nullable = false)
+    private boolean privateMessage;
 
     @PrePersist
     public void onCreate() {
@@ -65,16 +72,23 @@ public class Message {
         this.hidden = false;
         this.systemMessage = false;
         this.hasAnyAnswer = false;
+        this.privateMessage = false;
         if (this.authorType == null) {
             this.authorType = AuthorType.ANONYMOUS;
         }
     }
 
-    // 답변 달 때 사용할 헬퍼 메서드
+    // 기본 답변 (기존 로직용: OWNER)
     public void writeReply(String replyContent) {
+        writeReply(replyContent, ReplyAuthorType.OWNER);
+    }
+
+    // 답변 타입을 명시하는 진짜 메서드
+    public void writeReply(String replyContent, ReplyAuthorType type) {
         this.replyContent = replyContent;
         this.replyCreatedAt = LocalDateTime.now();
         this.hasAnyAnswer = true;
+        this.replyAuthorType = type;
     }
 
     // 숨김 처리

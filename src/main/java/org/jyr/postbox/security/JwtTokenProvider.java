@@ -25,8 +25,10 @@ public class JwtTokenProvider {
     }
 
     // 토큰 생성: subject 에 userId를 넣는다
-    public String createToken(String userId) {
+    public String createToken(String userId, String role) {
         Claims claims = Jwts.claims().setSubject(userId);
+        claims.put("role", role); // "USER" or "ADMIN"
+
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMs);
 
@@ -36,6 +38,14 @@ public class JwtTokenProvider {
                 .setExpiration(validity)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
+    }
+
+    public String getRole(String token) {
+        return (String) Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role");
     }
 
     // 토큰에서 userId(subject) 꺼내기

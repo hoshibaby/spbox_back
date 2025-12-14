@@ -13,30 +13,25 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/settings/blacklist")
+@CrossOrigin(origins = "http://localhost:5173")
 public class BlackListController {
 
     private final UserService userService;
     private final BlackListService blackListService;
 
     // 1) 내 블랙리스트 목록 조회
+    // GET /api/settings/blacklist?userId=ororong1
     @GetMapping
-    public ResponseEntity<List<BlackListDTO>> getMyBlackList(
-            @RequestParam("ownerEmail") String ownerEmail
-    ) {
-        User owner = userService.findByEmail(ownerEmail);
-        List<BlackListDTO> list = blackListService.getBlackListForOwner(owner);
-        return ResponseEntity.ok(list);
+    public ResponseEntity<List<BlackListDTO>> getMyBlackList(@RequestParam("userId") String userId) {
+        User owner = userService.findByUserId(userId);
+        return ResponseEntity.ok(blackListService.getBlackListForOwner(owner));
     }
 
-    // 2) 특정 유저 차단 해제
     @DeleteMapping
-    public ResponseEntity<?> unblock(
-            @RequestParam("ownerEmail") String ownerEmail,
-            @RequestParam("blockedUserId") Long blockedUserId
-    ) {
-        User owner = userService.findByEmail(ownerEmail);
+    public ResponseEntity<?> unblock(@RequestParam("userId") String userId,
+                                     @RequestParam("blockedUserId") Long blockedUserId) {
+        User owner = userService.findByUserId(userId);
         blackListService.unblockUser(blockedUserId, owner);
         return ResponseEntity.ok("블랙리스트 해제 완료!");
     }
 }
-

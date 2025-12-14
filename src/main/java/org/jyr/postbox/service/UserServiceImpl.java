@@ -1,10 +1,7 @@
 package org.jyr.postbox.service;
 
 import lombok.RequiredArgsConstructor;
-import org.jyr.postbox.domain.Box;
-import org.jyr.postbox.domain.Message;
-import org.jyr.postbox.domain.User;
-import org.jyr.postbox.domain.UserRole;
+import org.jyr.postbox.domain.*;
 import org.jyr.postbox.dto.user.*;
 import org.jyr.postbox.repository.*;
 import org.jyr.postbox.security.JwtTokenProvider;
@@ -101,13 +98,22 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUserId(dto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이디입니다."));
 
+        //1-1) 유저검증
+        if (user.getStatus() == UserStatus.BANNED) {
+            throw new IllegalStateException("운영 정책 위반으로 해당 계정의 이용이 제한되었습니다.");
+        }
+
         // 2) 비밀번호 검증
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 3) JWT 토큰 생성 (subject = userId)
-        String token = jwtTokenProvider.createToken(user.getUserId());
+        // 3) JWT 토큰 생성 (userId + role)
+        String token = jwtTokenProvider.createToken(
+                user.getUserId(),
+                user.getRole().name()   // 또는 user.getUserRole().name()
+        );
+
 
         // 4) 유저의 박스 조회
         Box box = boxRepository.findByOwner(user)
@@ -168,6 +174,9 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+
+
+
     // 임시 비밀번호 생성 유틸
     private String generateTempPassword(int length) {
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -221,7 +230,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         if (dto.getNickname() != null && !dto.getNickname().isBlank()) {
-            user.setNickname(dto.getNickname());
+            user.setNickname(dto.getNickname().trim());
         }
         if (dto.getProfileImageUrl() != null) {
             user.setProfileImageUrl(dto.getProfileImageUrl());
@@ -229,12 +238,22 @@ public class UserServiceImpl implements UserService {
         if (dto.getHeaderImageUrl() != null) {
             user.setHeaderImageUrl(dto.getHeaderImageUrl());
         }
+
+        // ✅ 추가: 오늘 한마디 업데이트
+        if (dto.getTodayMessage() != null) {
+            String msg = dto.getTodayMessage().trim();
+            // 선택: 너무 긴 입력 방어
+            if (msg.length() > 120) msg = msg.substring(0, 120);
+            user.setTodayMessage(msg);
+        }
+
         if (dto.getAiConsultingEnabled() != null) {
             user.setAiConsultingEnabled(dto.getAiConsultingEnabled());
         }
 
         return MyProfileResponseDTO.from(user); // 더티체킹으로 update
     }
+
 
     @Override
     @Transactional

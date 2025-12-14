@@ -20,4 +20,5 @@ public class MyBoxResponseDTO {
     private BoxHeaderDTO box;                       // 박스 헤더 정보
     private List<MessageSummaryDTO> messages; // 메시지 요약 리스트
     private boolean allowAnonymous;
+    private boolean aiMode;
 }

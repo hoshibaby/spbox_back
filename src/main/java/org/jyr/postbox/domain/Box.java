@@ -34,17 +34,23 @@ public class Box {
 
     private LocalDateTime createdAt;
 
-    // 선택: 박스에 달린 메시지들
+    // 박스에 달린 메시지들
     @OneToMany(mappedBy = "box")
     @Builder.Default
     private List<Message> messages = new ArrayList<>();
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean allowAnonymous = true;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean aiMode = false;
 
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
+
         if (this.title == null || this.title.isBlank()) {
             this.title = "익명 메시지함";
         }

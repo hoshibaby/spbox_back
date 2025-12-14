@@ -35,4 +35,5 @@ public interface UserService {
     // ⭐ 비밀번호 변경 (로그인 상태)
     void changePassword(String userId, String currentPassword, String newPassword);
 
+
 }

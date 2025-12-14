@@ -42,17 +42,19 @@ public class BlackListServiceImpl implements BlackListService {
     @Transactional
     public void unblockUser(Long blockedUserId, User owner) {
 
-        // 1) 내 박스 찾기
         Box box = boxRepository.findByOwner(owner)
                 .orElseThrow(() -> new IllegalStateException("박스를 찾을 수 없습니다."));
 
-        // 2) 차단된 유저 조회
         User blockedUser = userRepository.findById(blockedUserId)
                 .orElseThrow(() -> new IllegalArgumentException("차단된 유저를 찾을 수 없습니다."));
 
-        // 3) 실제 삭제 (레포 메서드 사용)
-        blackListRepository.deleteByBoxAndBlockedUser(box, blockedUser);
+        long deleted = blackListRepository.deleteByBoxAndBlockedUser(box, blockedUser);
+
+        if (deleted == 0) {
+            throw new IllegalArgumentException("블랙리스트에 등록되어 있지 않습니다.");
+        }
     }
+
 
     // ================== private 메서드 ==================
 
@@ -63,7 +65,7 @@ public class BlackListServiceImpl implements BlackListService {
                 .id(entity.getId())
                 .blockedUserId(blocked.getId())
                 .blockedNickname(blocked.getNickname())
-                .blockedEmail(blocked.getEmail())
+                .blockedUserIdStr(blocked.getUserId())
                 .build();
     }
 }

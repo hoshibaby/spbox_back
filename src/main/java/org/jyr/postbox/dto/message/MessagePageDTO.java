@@ -3,6 +3,7 @@ package org.jyr.postbox.dto.message;
 
 import lombok.Builder;
 import lombok.Data;
+import org.jyr.postbox.dto.box.BoxHeaderDTO;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class MessagePageDTO {
     private int size;              // 한 페이지당 사이즈
     private int totalPages;        // 전체 페이지 수
     private long totalElements;    // 전체 데이터 개수
-
+    private BoxHeaderDTO box;
     private boolean allowAnonymous; //로그인 한 사람만 글쓰기
 
     // 화면에 뿌릴 메시지 요약 리스트

@@ -15,5 +15,5 @@ public interface BoxRepository extends JpaRepository<Box, Long> {
     Optional<Box> findByUrlKey(String urlKey);
 
     //owner.userId 로 박스 찾기
-    Optional<Box> findByOwner_UserId(String userId);
+    Optional<Box> findByOwner_UserId(String userId);;
 }

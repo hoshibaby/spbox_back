@@ -2,6 +2,7 @@ package org.jyr.postbox.dto.message;
 
 import lombok.Builder;
 import lombok.Data;
+import org.jyr.postbox.dto.box.BoxHeaderDTO;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +19,7 @@ public class MessageDetailDTO {
     // 답장 정보
     private String replyContent;       // 답변 내용 (없으면 null)
     private LocalDateTime replyCreatedAt;
-
+    private BoxHeaderDTO box;
     private Long authorUserId;   // null 가능
     private String authorType;   // OWNER / ANONYMOUS
     private Long boxOwnerId;

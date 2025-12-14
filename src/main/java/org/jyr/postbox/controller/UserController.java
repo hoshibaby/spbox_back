@@ -27,15 +27,15 @@ public class UserController {
         return ResponseEntity.ok(dto);
     }
 
-    // 🔹 AI 상담 토글
-    @PutMapping("/settings/ai")
-    public ResponseEntity<Void> toggleAiConsulting(
-            @RequestParam("userId") String userId,
-            @RequestParam("enabled") boolean enabled
-    ) {
-        userService.updateAiConsultingByUserId(userId, enabled);
-        return ResponseEntity.ok().build();
-    }
+//    // 🔹 AI 상담 토글
+//    @PutMapping("/settings/ai")
+//    public ResponseEntity<Void> toggleAiConsulting(
+//            @RequestParam("userId") String userId,
+//            @RequestParam("enabled") boolean enabled
+//    ) {
+//        userService.updateAiConsultingByUserId(userId, enabled);
+//        return ResponseEntity.ok().build();
+//    }
 
     // 🔹 계정 삭제
     @DeleteMapping

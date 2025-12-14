@@ -81,6 +81,25 @@ public class BoxController {
         return ResponseEntity.ok(dto);
     }
 
+    // ✅ 박스: 익명(비회원) 글쓰기 허용 토글
+    // PUT /api/me/box/anonymous?userId=ororong1&allowAnonymous=true
+    @PutMapping("/me/box/anonymous")
+    public ResponseEntity<Void> updateAllowAnonymous(
+            @RequestParam("userId") String userId,
+            @RequestParam("allowAnonymous") boolean allowAnonymous
+    ) {
+        boxService.updateAllowAnonymous(userId, allowAnonymous);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/me/settings/ai")
+    public ResponseEntity<Void> updateAiMode(
+            @RequestParam String userId,
+            @RequestParam boolean enabled
+    ) {
+        boxService.updateAiMode(userId, enabled);
+        return ResponseEntity.ok().build();
+    }
 
 
 

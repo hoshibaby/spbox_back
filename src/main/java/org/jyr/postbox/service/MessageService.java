@@ -41,7 +41,7 @@ public interface MessageService {
     void updateMessage(Long messageId, String newContent, User loginUser);
     void deleteMessage(Long messageId, User loginUser);
 
-
+    void generateAiReply(Long messageId, String loginUserId);
 
 
 }

@@ -16,6 +16,8 @@ public class MyProfileResponseDTO {
     private String nickname;
     private String profileImageUrl;
     private String headerImageUrl;
+
+    private String todayMessage;     // ✅ 오늘 한마디
     private boolean aiConsultingEnabled;
 
     public static MyProfileResponseDTO from(User user) {
@@ -27,7 +29,9 @@ public class MyProfileResponseDTO {
                 .nickname(user.getNickname())
                 .profileImageUrl(user.getProfileImageUrl())
                 .headerImageUrl(user.getHeaderImageUrl())
+                .todayMessage(user.getTodayMessage()) //
                 .aiConsultingEnabled(user.isAiConsultingEnabled())
                 .build();
     }
 }
+

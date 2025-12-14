@@ -50,4 +50,14 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
     // 답변이 존재하는 메시지 목록 (replyContent NOT NULL)
     Page<Message> findByBoxAndReplyContentIsNotNullOrderByCreatedAtDesc(Box box, Pageable pageable);//답변 메세지 수
 
+    Page<Message> findByBoxAndHiddenFalseAndSystemMessageFalseOrderByCreatedAtDesc(
+            Box box,
+            Pageable pageable
+    );
+
+    Page<Message> findByBoxAndHiddenFalseAndSystemMessageFalseAndPrivateMessageFalseOrderByCreatedAtDesc(
+            Box box,
+            Pageable pageable
+    );
+
 }
